@@ -1,5 +1,5 @@
-﻿/// <reference path="jquery-1.8.0.js" />
-/// <reference path="jquery.signalR-0.5.3.js" />
+﻿/// <reference path="jquery-1.9.1.js" />
+/// <reference path="jquery.signalR-1.0.0-rc2.js" />
 /// <reference path="knockout-2.1.0.js" />
 // ---------------------------------------------------------------------------------- 
 // Microsoft Developer & Platform Evangelism 
@@ -37,9 +37,9 @@ $(function () {
         self.model = new GridViewModel([]);
         self.connection = $.hubConnection();
         self.connection.logging = true;
-        self.siteMonitorHub = self.connection.createProxy("SiteMonitR");
+        self.siteMonitorHub = self.connection.createHubProxy("SiteMonitR");
 
-        this.updateSite = function (url, cssClass, siteStatus) {
+        self.updateSite = function (url, cssClass, siteStatus) {
             self.model.items().forEach(function (n) {
                 if (n.url == url) {
                     n.cssClass(cssClass);
@@ -96,6 +96,17 @@ $(function () {
             });
             c.toggleSpinner(false);
             c.toggleGrid();
+
+            $('.removeSite').on('click', function () {
+                c.toggleSpinner(true);
+                var url = $(this).data('url');
+
+                $('.site[data-url="' + url + '"]').fadeOut('fast', function () {
+                    $('.site[data-url="' + url + '"]').remove();
+                });
+
+                c.siteMonitorHub.invoke('removeSite', url);
+            });
         })
         .on('siteStatusUpdated', function (monitorUpdate) {
             c.updateSiteStatus(monitorUpdate);
@@ -122,17 +133,6 @@ $(function () {
         c.addSite(u);
         c.toggleSpinner(true);
         c.siteMonitorHub.invoke('addSite', u);
-    });
-
-    $('.removeSite').live('click', function () {
-        c.toggleSpinner(true);
-        var url = $(this).data('url');
-
-        $('.site[data-url="' + url + '"]').fadeOut('fast', function () {
-            $('.site[data-url="' + url + '"]').remove();
-        });
-
-        c.siteMonitorHub.invoke('removeSite', url);
     });
 
     c.connection.start().done(function () {

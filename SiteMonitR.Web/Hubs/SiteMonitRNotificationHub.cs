@@ -14,11 +14,12 @@
 // places, or events is intended or should be inferred. 
 // ---------------------------------------------------------------------------------- 
 
+using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using SignalR.Hubs;
 
 namespace SiteMonitR.Web.Hubs
 {
@@ -27,47 +28,47 @@ namespace SiteMonitR.Web.Hubs
     {
         public void ServiceReady()
         {
-            Clients.serviceIsUp();
+            Clients.All.serviceIsUp();
         }
 
         public void ReceiveMonitorUpdate(dynamic monitorUpdate)
         {
-            Clients.siteStatusUpdated(monitorUpdate);
+            Clients.All.siteStatusUpdated(monitorUpdate);
         }
 
         public void AddSiteToGui(string url)
         {
-            Clients.siteAddedToGui(url);
+            Clients.All.siteAddedToGui(url);
         }
 
         public void RemoveSiteFromGui(string url)
         {
-            Clients.siteRemovedFromGui(url);
+            Clients.All.siteRemovedFromGui(url);
         }
 
         public void AddSite(string url)
         {
-            Clients.siteAddedToStorage(url);
+            Clients.All.siteAddedToStorage(url);
         }
 
         public void RemoveSite(string url)
         {
-            Clients.siteRemovedFromStorage(url);
+            Clients.All.siteRemovedFromStorage(url);
         }
 
         public void GetSiteList()
         {
-            Clients.siteListRequested();
+            Clients.All.siteListRequested();
         }
 
         public void ListOfSitesObtained(List<string> urls)
         {
-            Clients.siteListObtained(urls);
+            Clients.All.siteListObtained(urls);
         }
 
         public void CheckSite(string url)
         {
-            Clients.checkingSite(url);
+            Clients.All.checkingSite(url);
         }
     }
 }

@@ -23,7 +23,7 @@ using System.Net;
 using System.Text;
 using System.Timers;
 using Microsoft.WindowsAzure.ServiceRuntime;
-using SignalR.Client.Hubs;
+using Microsoft.AspNet.SignalR.Client.Hubs;
 
 namespace SiteMonitR
 {
@@ -69,7 +69,7 @@ namespace SiteMonitR
                     _connection = new HubConnection(url);
 
                     // create a proxy
-                    _hub = _connection.CreateProxy("SiteMonitR");
+                    _hub = _connection.CreateHubProxy("SiteMonitR");
 
                     // whenever a site is added
                     _hub.On<string>("siteAddedToStorage", (siteUrl) =>

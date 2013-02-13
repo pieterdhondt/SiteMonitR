@@ -14,16 +14,15 @@
 // places, or events is intended or should be inferred. 
 // ---------------------------------------------------------------------------------- 
 
+using Microsoft.WindowsAzure.Storage.Table.DataServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Microsoft.WindowsAzure.StorageClient;
 
 namespace SiteMonitR.WorkerRole
 {
-    public class StoredSiteUrl
-        : TableServiceEntity
+    public class StoredSiteUrl : TableServiceEntity
     {
         public StoredSiteUrl()
         {
