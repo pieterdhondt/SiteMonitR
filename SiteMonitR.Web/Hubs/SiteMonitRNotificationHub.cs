@@ -1,23 +1,8 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Microsoft Developer & Platform Evangelism 
-//  
-// Copyright (c) Microsoft Corporation. All rights reserved. 
-//  
-// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,  
-// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES  
-// OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE. 
-// ---------------------------------------------------------------------------------- 
-// The example companies, organizations, products, domain names, 
-// e-mail addresses, logos, people, places, and events depicted 
-// herein are fictitious.  No association with any real company, 
-// organization, product, domain name, email address, logo, person, 
-// places, or events is intended or should be inferred. 
-// ---------------------------------------------------------------------------------- 
-
-using Microsoft.AspNet.SignalR;
+﻿using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
@@ -26,43 +11,47 @@ namespace SiteMonitR.Web.Hubs
     [HubName("SiteMonitR")]
     public class SiteMonitRNotificationHub : Hub
     {
-        public void ServiceReady()
+        private ISiteUrlRepository _repository;
+        private ISiteResultReceiver _siteResultReceiver;
+
+        public SiteMonitRNotificationHub(ISiteUrlRepository repository,
+            ISiteResultReceiver resultReceiver)
         {
-            Clients.All.serviceIsUp();
+            _repository = repository;
+            _siteResultReceiver = resultReceiver;
+
+            _siteResultReceiver.StatusUpdated += OnReceiveSiteResult;
         }
 
-        public void ReceiveMonitorUpdate(dynamic monitorUpdate)
-        {
-            Clients.All.siteStatusUpdated(monitorUpdate);
-        }
+        int mtdCnt = 0;
 
-        public void AddSiteToGui(string url)
+        private void OnReceiveSiteResult(object sender, SiteResultEventArgs e)
         {
-            Clients.All.siteAddedToGui(url);
-        }
+            mtdCnt += 1;
 
-        public void RemoveSiteFromGui(string url)
-        {
-            Clients.All.siteRemovedFromGui(url);
+            Debug.WriteLine("{0} OnReceiveSiteResult called {1} times on hub {2}",
+                base.Context.ConnectionId, 
+                mtdCnt,
+                base.Context.ConnectionId);
+
+            Clients.Caller.siteStatusUpdated(e.Result);
         }
 
         public void AddSite(string url)
         {
-            Clients.All.siteAddedToStorage(url);
+            _repository.Add(url);
+            Clients.All.siteAddedToGui(url);
         }
 
         public void RemoveSite(string url)
         {
-            Clients.All.siteRemovedFromStorage(url);
+            _repository.Remove(url);
+            Clients.All.siteRemovedFromGui(url);
         }
 
         public void GetSiteList()
         {
-            Clients.All.siteListRequested();
-        }
-
-        public void ListOfSitesObtained(List<string> urls)
-        {
+            var urls = _repository.GetUrls();
             Clients.All.siteListObtained(urls);
         }
 

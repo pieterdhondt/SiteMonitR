@@ -1,31 +1,16 @@
-﻿// ---------------------------------------------------------------------------------- 
-// Microsoft Developer & Platform Evangelism 
-//  
-// Copyright (c) Microsoft Corporation. All rights reserved. 
-//  
-// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,  
-// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES  
-// OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE. 
-// ---------------------------------------------------------------------------------- 
-// The example companies, organizations, products, domain names, 
-// e-mail addresses, logos, people, places, and events depicted 
-// herein are fictitious.  No association with any real company, 
-// organization, product, domain name, email address, logo, person, 
-// places, or events is intended or should be inferred. 
-// ---------------------------------------------------------------------------------- 
-
-using Microsoft.WindowsAzure;
+﻿using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using Microsoft.WindowsAzure.Storage.Table.DataServices;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace SiteMonitR.WorkerRole
+namespace SiteMonitR
 {
     public class TableStorageSiteUrlRepository : ISiteUrlRepository
     {
@@ -35,15 +20,14 @@ namespace SiteMonitR.WorkerRole
         private CloudTableClient _tableClient;
         private TableServiceContext _tableContext;
 
-        public TableStorageSiteUrlRepository()
+        public TableStorageSiteUrlRepository(IStorageQueueConfiguration configuration)
         {
-            _storageAccount = CloudStorageAccount.Parse(
-                RoleEnvironment.GetConfigurationSettingValue(_connectionStringName)
-                );
+            _storageAccount = CloudStorageAccount.Parse(configuration.GetConnectionString());
 
             _tableClient = _storageAccount.CreateCloudTableClient();
             _tableClient.GetTableReference(_tableName);
             _tableClient.GetTableReference(_tableName).CreateIfNotExists();
+
             _tableContext = _tableClient.GetTableServiceContext();
         }
 

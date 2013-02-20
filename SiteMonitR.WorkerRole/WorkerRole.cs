@@ -1,19 +1,3 @@
-// ---------------------------------------------------------------------------------- 
-// Microsoft Developer & Platform Evangelism 
-//  
-// Copyright (c) Microsoft Corporation. All rights reserved. 
-//  
-// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,  
-// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES  
-// OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE. 
-// ---------------------------------------------------------------------------------- 
-// The example companies, organizations, products, domain names, 
-// e-mail addresses, logos, people, places, and events depicted 
-// herein are fictitious.  No association with any real company, 
-// organization, product, domain name, email address, logo, person, 
-// places, or events is intended or should be inferred. 
-// ---------------------------------------------------------------------------------- 
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,13 +8,17 @@ using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using SiteMonitR.WorkerRole.Properties;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
 
 namespace SiteMonitR.WorkerRole
 {
     public class WorkerRole : RoleEntryPoint
     {
-        Thread thread;
-        Server server;
+        CloudStorageAccount _account;
+        CloudQueueClient _queueClient;
+        CloudQueue _queue;
 
         public override void Run()
         {
@@ -38,32 +26,46 @@ namespace SiteMonitR.WorkerRole
 
             while (true)
             {
+                var sites = new TableStorageSiteUrlRepository(
+                    new WorkerRoleQueueConfiguration()
+                    ).GetUrls();
+
+                foreach (var url in sites)
+                {
+                    var result = new SiteResult { Url = url, Status = "Checking" };
+                    var json = JsonConvert.SerializeObject(result);
+
+                    _queue.AddMessage(new CloudQueueMessage(json));
+
+                    try
+                    {
+                        new WebClient().DownloadString(url);
+                        result = new SiteResult { Url = url, Status = "Up" };
+                    }
+                    catch
+                    {
+                        result = new SiteResult { Url = url, Status = "Down" };
+                    }
+
+                    json = JsonConvert.SerializeObject(result);
+                    _queue.AddMessage(new CloudQueueMessage(json));
+                }
+
                 Thread.Sleep(Settings.Default.PingTimeout);
-                server.Run();
             }
         }
 
         public override bool OnStart()
         {
-            ServicePointManager.DefaultConnectionLimit = 12;
+            _account = CloudStorageAccount.Parse(
+                    RoleEnvironment.GetConfigurationSettingValue("SiteMonitRConnectionString")
+                    );
 
-            // create the server
-            server = new Server(
-                new TableStorageSiteUrlRepository(), 
-                new WorkerRoleHubConfiguration()
-                );
-
-            // run the server
-            thread = new Thread(new ThreadStart(() => server.Run()));
-            thread.Start();
+            _queueClient = _account.CreateCloudQueueClient();
+            _queue = _queueClient.GetQueueReference(new WebSiteQueueConfiguration().GetIncomingQueueName());
+            _queue.CreateIfNotExists();
 
             return base.OnStart();
-        }
-
-        public override void OnStop()
-        {
-            thread.Abort();
-            server.Stop();
         }
     }
 }

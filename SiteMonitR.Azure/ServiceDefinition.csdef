@@ -5,7 +5,6 @@
       <Import moduleName="Diagnostics" />
     </Imports>
     <ConfigurationSettings>
-      <Setting name="GUI_URL" />
       <Setting name="SiteMonitRConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>

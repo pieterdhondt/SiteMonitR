@@ -1,22 +1,4 @@
-﻿/// <reference path="jquery-1.9.1.js" />
-/// <reference path="jquery.signalR-1.0.0-rc2.js" />
-/// <reference path="knockout-2.1.0.js" />
-// ---------------------------------------------------------------------------------- 
-// Microsoft Developer & Platform Evangelism 
-//  
-// Copyright (c) Microsoft Corporation. All rights reserved. 
-//  
-// THIS CODE AND INFORMATION ARE PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND,  
-// EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES  
-// OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE. 
-// ---------------------------------------------------------------------------------- 
-// The example companies, organizations, products, domain names, 
-// e-mail addresses, logos, people, places, and events depicted 
-// herein are fictitious.  No association with any real company, 
-// organization, product, domain name, email address, logo, person, 
-// places, or events is intended or should be inferred. 
-// ---------------------------------------------------------------------------------- 
-$(function () {
+﻿$(function () {
 
     $('#noSitesToMonitorMessage').hide();
 
@@ -40,6 +22,7 @@ $(function () {
         self.siteMonitorHub = self.connection.createHubProxy("SiteMonitR");
 
         self.updateSite = function (url, cssClass, siteStatus) {
+            console.info('updateSite,' + url + ':' + 'Status: ' + siteStatus + ', CSS Class:' + cssClass);
             self.model.items().forEach(function (n) {
                 if (n.url == url) {
                     n.cssClass(cssClass);
@@ -56,11 +39,14 @@ $(function () {
         };
 
         self.updateSiteStatus = function (monitorUpdate) {
-            if (monitorUpdate.Result == true) {
+            if (monitorUpdate.Status == 'Up') {
                 self.updateSite(monitorUpdate.Url, 'btn-success', 'Up');
             }
-            else {
+            if (monitorUpdate.Status == 'Down') {
                 self.updateSite(monitorUpdate.Url, 'btn-danger', 'Down');
+            }
+            if (monitorUpdate.Status == 'Checking') {
+                self.updateSite(monitorUpdate.Url, 'btn-warning', 'Checking');
             }
         };
 
@@ -86,10 +72,6 @@ $(function () {
     var c = new controller();
 
     c.siteMonitorHub
-        .on('serviceIsUp', function () {
-            c.toggleSpinner(true);
-            c.siteMonitorHub.invoke('getSiteList');
-        })
         .on('siteListObtained', function (sites) {
             $(sites).each(function (i, site) {
                 c.addSite(site);

@@ -3,9 +3,8 @@
   <Role name="SiteMonitR.WorkerRole">
     <Instances count="1" />
     <ConfigurationSettings>
-      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
-      <Setting name="GUI_URL" value="http://localhost:4200" />
-      <Setting name="SiteMonitRConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="DefaultEndpointsProtocol=https;AccountName=wazsamples;AccountKey=cAGvSQGl8BYpF/JPmXdtEtjncVgFm/Te6hBoO02d9u3Pt3vWcqbtpWoKVsJS5LQDcBjP0a+4AA4QhuSVECq3SA==" />
+      <Setting name="SiteMonitRConnectionString" value="DefaultEndpointsProtocol=https;AccountName=wazsamples;AccountKey=cAGvSQGl8BYpF/JPmXdtEtjncVgFm/Te6hBoO02d9u3Pt3vWcqbtpWoKVsJS5LQDcBjP0a+4AA4QhuSVECq3SA==" />
     </ConfigurationSettings>
   </Role>
 </ServiceConfiguration>
