@@ -1,54 +1,35 @@
-﻿using Microsoft.AspNet.SignalR;
-using Ninject;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Optimization;
 using System.Web.Routing;
-using System.Web.Security;
-using System.Web.SessionState;
+using Microsoft.AspNet.SignalR;
+using Owin;
+using Microsoft.Owin;
 
 namespace SiteMonitR.Web
 {
-    public class Global : System.Web.HttpApplication
+    public class MvcApplication : System.Web.HttpApplication
     {
-        internal static IKernel _kernel;
-
-        protected void Application_Start(object sender, EventArgs e)
+        protected void Application_Start()
         {
-            _kernel = new StandardKernel();
-            _kernel.Bind<ISiteUrlRepository>().To<TableStorageSiteUrlRepository>();
-            _kernel.Bind<ISiteResultReceiver>().To<WindowsAzureQueueSiteResultReceiver>().InSingletonScope();
-            _kernel.Bind<IStorageQueueConfiguration>().To<WebSiteQueueConfiguration>();
-
-            var resolver = new NinjectDependencyResolver(_kernel);
-            GlobalHost.DependencyResolver = resolver;
-            RouteTable.Routes.MapHubs();
-
-            _kernel.TryGet<ISiteResultReceiver>().StartWatching();
+            AreaRegistration.RegisterAllAreas();
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+            RouteConfig.RegisterRoutes(RouteTable.Routes);
+            BundleConfig.RegisterBundles(BundleTable.Bundles);
         }
     }
 
-    public class NinjectDependencyResolver : DefaultDependencyResolver
+    [assembly: OwinStartup(typeof(Startup))]
+    public class Startup
     {
-        private readonly IKernel _kernel;
-
-        public NinjectDependencyResolver(IKernel kernel)
+        public void Configuration(IAppBuilder app)
         {
-            if (kernel == null)
-                throw new ArgumentNullException("kernel");
-
-            _kernel = kernel;
-        }
-
-        public override object GetService(Type serviceType)
-        {
-            return _kernel.TryGet(serviceType) ?? base.GetService(serviceType);
-        }
-
-        public override IEnumerable<object> GetServices(Type serviceType)
-        {
-            return _kernel.GetAll(serviceType).Concat(base.GetServices(serviceType));
+            app.MapSignalR();
         }
     }
 }
