@@ -1,7 +1,9 @@
-﻿using Microsoft.WindowsAzure.Jobs;
+﻿using Microsoft.Azure.Jobs;
+using Microsoft.WindowsAzure.Storage.Table;
 using SiteMonitR.Common;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace SiteMonitR.WebJobs.Scheduled
@@ -14,23 +16,23 @@ namespace SiteMonitR.WebJobs.Scheduled
 
             // the table containing the list of sites
             [Table(SiteMonitRConfiguration.TABLE_NAME_SITES)] 
-                IDictionary<Tuple<string, string>, SiteRecord> siteRecords,
-
+            IQueryable<SiteRecord> siteRecords,
+          
+            // update the site results table
+            [Table(SiteMonitRConfiguration.TABLE_NAME_SITES)] 
+            CloudTable recordTable,
+          
             // the queue that will receive site results
-            [QueueOutput(SiteMonitRConfiguration.QUEUE_NAME_INCOMING_SITE_LOG)] 
-                out IEnumerable<SiteResult> siteResults
+            [Queue(SiteMonitRConfiguration.QUEUE_NAME_INCOMING_SITE_LOG)] 
+                ICollection<SiteResult> siteResults
             )
         {
-
-            // create a new list of the result classes
-            var resultList = new List<SiteResult>();
-
             foreach (var nv in siteRecords)
             {
                 // create a new result for this site
                 var siteResult = new SiteResult
                 {
-                    Uri = nv.Value.Uri,
+                    Uri = nv.Uri,
                     Status = SiteMonitRConfiguration.DASHBOARD_SITE_CHECKING
                 };
 
@@ -53,15 +55,12 @@ namespace SiteMonitR.WebJobs.Scheduled
                 }
 
                 // add the result to the list
-                resultList.Add(siteResult);
+                // send the messages into the queue individually once this function completes
+                siteResults.Add(siteResult);
 
                 // update the UX to let the user know we're done checking this site
                 SiteMonitRConfiguration.UpdateDashboard(siteResult);
             }
-
-            // set the output value, sending the messages into the queue individually
-            siteResults = resultList;
-
         }
 
         static void Main(string[] args)
@@ -71,6 +70,4 @@ namespace SiteMonitR.WebJobs.Scheduled
             host.Call(methodInfo);
         }
     }
-
-
 }

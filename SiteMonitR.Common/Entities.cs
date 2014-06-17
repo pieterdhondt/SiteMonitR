@@ -1,13 +1,14 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 
 namespace SiteMonitR.Common
 {
-    public class SiteRecord
+    public class SiteRecord : TableEntity
     {
         public string Uri { get; set; }
     }
 
-    public class SiteResult
+    public class SiteResult : TableEntity
     {
         public string Uri { get; set; }
         public string Status { get; set; }
