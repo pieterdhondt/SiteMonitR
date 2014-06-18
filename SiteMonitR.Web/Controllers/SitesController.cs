@@ -21,7 +21,7 @@ namespace SiteMonitR.Web.Controllers
         public SitesController()
         {
             _helper = AzureStorageHelper.Connect(
-                ConfigurationManager.ConnectionStrings["AzureJobsRuntime"]
+                ConfigurationManager.ConnectionStrings["AzureJobsStorage"]
                     .ConnectionString
                 );
         }
