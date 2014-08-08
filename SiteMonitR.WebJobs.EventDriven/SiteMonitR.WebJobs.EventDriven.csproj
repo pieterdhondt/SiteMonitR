@@ -32,13 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Azure.Jobs, Version=0.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\azuresimplebatch\bin\Binaries\Microsoft.Azure.Jobs.dll</HintPath>
+    <Reference Include="Microsoft.Azure.Jobs">
+      <HintPath>..\packages\Microsoft.Azure.Jobs.Core.0.3.1-beta\lib\net45\Microsoft.Azure.Jobs.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Azure.Jobs.Host, Version=0.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\azuresimplebatch\bin\Binaries\Microsoft.Azure.Jobs.Host.dll</HintPath>
+    <Reference Include="Microsoft.Azure.Jobs.Host">
+      <HintPath>..\packages\Microsoft.Azure.Jobs.0.3.1-beta\lib\net45\Microsoft.Azure.Jobs.Host.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Data.Edm, Version=5.6.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Data.Edm.5.6.0\lib\net40\Microsoft.Data.Edm.dll</HintPath>
