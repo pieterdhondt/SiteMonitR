@@ -22,8 +22,8 @@ The instructions below will walk you through the process of setting up SiteMonit
     DefaultEndpointsProtocol=https;AccountName=[YOUR ACCOUNT NAME];AccountKey=[YOUR ACCOUNT KEY]
 
 1. Go to the Web Site's **Configure** tab in the Management Portal
-1. Create a new Connection String for the web site **using the Azure Management Portal** *(just setting the value in your Web.config file won't work, you need to set this using the portal)* you just deployed named **AzureJobsDashboard** and paste the connection string as the value of the Connection String.
-1. Create a new Connection String for the web site **using the Azure Management Portal** *(just setting the value in your Web.config file won't work, you need to set this using the portal)* you just deployed named **AzureJobsStorage** and paste the connection string as the value of the Connection String.
+1. Create a new Connection String for the web site **using the Azure Management Portal** *(just setting the value in your Web.config file won't work, you need to set this using the portal)* you just deployed named **AzureWebJobsDashboard** and paste the connection string as the value of the Connection String.
+1. Create a new Connection String for the web site **using the Azure Management Portal** *(just setting the value in your Web.config file won't work, you need to set this using the portal)* you just deployed named **AzureWebJobsStorage** and paste the connection string as the value of the Connection String.
 1. Create a new App Setting for the web site **using the Azure Management Portal**. The name of the App Setting should be set to **SiteMonitR.DashboardUrl** and the value should be your web site's root URL (i.e., http://sitemonitr.azurewebsites.net)
 1. Go to the **WebJobs** tab for the Web Site in the Management Portal
 1. Click the **Add a Job** link
