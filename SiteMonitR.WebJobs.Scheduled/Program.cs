@@ -8,7 +8,7 @@ namespace SiteMonitR.WebJobs.Scheduled
         static void Main(string[] args)
         {
             JobHost host = new JobHost();
-            var methodInfo = typeof(Program).GetMethod("CheckSitesFunction");
+            var methodInfo = typeof(Functions).GetMethod("CheckSitesFunction");
             host.Call(methodInfo);
         }
     }
